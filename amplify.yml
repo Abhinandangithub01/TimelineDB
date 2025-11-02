@@ -3,15 +3,9 @@ frontend:
   phases:
     preBuild:
       commands:
-        - echo "=== Checking lib folder ==="
-        - ls -la lib/ || echo "lib folder not found"
-        - echo "=== Checking tsconfig.json ==="
-        - cat tsconfig.json
-        - echo "=== Installing dependencies ==="
         - npm ci --cache .npm --prefer-offline
     build:
       commands:
-        - echo "=== Starting build ==="
         - npm run build
   artifacts:
     baseDirectory: .next
