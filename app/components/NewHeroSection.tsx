@@ -26,11 +26,11 @@ export function NewHeroSection() {
 
             {/* Subtitle */}
             <p className="text-xl text-gray-300 mb-4 max-w-xl">
-              Complete security platform trusted by modern development teams to analyze code, ensure compliance, and optimize performance.
+              Two-phase cascading intelligence with 4 specialized AI agents running in parallel on Tiger database forks.
             </p>
 
             <p className="text-lg text-gray-400 mb-8 max-w-xl">
-              Streamline your entire security workflow with our all-in-one solution. From vulnerability detection to compliance certification, analyze every aspect of your codebase efficiently with powerful automation, real-time analytics, and seamless integrations.
+              Phase 1 tests 4 RAG strategies and picks the winner. Phase 2 uses it for Security, SOC2, ISO 27001, and Performance analysis—all in 7 seconds with 89% accuracy.
             </p>
 
             {/* CTA Buttons */}

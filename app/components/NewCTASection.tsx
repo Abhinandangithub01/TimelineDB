@@ -8,10 +8,10 @@ export function NewCTASection() {
       <div className="max-w-4xl mx-auto text-center">
         {/* Main CTA */}
         <h2 className="text-4xl md:text-5xl font-bold mb-6">
-          Ready to secure your codebase?
+          Experience cascading intelligence in action
         </h2>
         <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-          Join modern development teams using Fortify for automated security analysis, compliance checking, and performance optimization.
+          See how 4 RAG strategies compete, 4 AI agents collaborate, and Tiger forks accelerate your security analysis—all in 7 seconds.
         </p>
 
         {/* Buttons */}
