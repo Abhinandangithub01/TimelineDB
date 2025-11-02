@@ -1,0 +1,416 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --tiger-orange: #FF6B35;
+  --tiger-dark: #C44D2C;
+  --tiger-light: #FFE5DB;
+  
+  --fortress-black: #1A1D23;
+  --fortress-slate: #2D3748;
+  --fortress-gray: #4A5568;
+  --fortress-light: #E2E8F0;
+  --fortress-white: #FFFFFF;
+  
+  --bg-main: #F7FAFC;
+  --bg-card: #FFFFFF;
+  --bg-nav: #1A1D23;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--fortress-black);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Custom transitions */
+button, a {
+  transition: all 150ms ease;
+}
+
+/* Custom button styles */
+.btn-primary {
+  background-color: var(--tiger-orange);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: var(--tiger-dark);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--tiger-orange);
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: 2px solid var(--tiger-orange);
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: var(--tiger-light);
+}
+
+/* Card styles */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--fortress-light);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(26, 29, 35, 0.1);
+  transition: all 200ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px rgba(26, 29, 35, 0.1);
+  border-color: var(--tiger-orange);
+}
+
+/* Animations for enhanced components */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progressBar {
+  from {
+    width: 0%;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight 0.4s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Progress bar animation */
+.progress-bar {
+  transition: width 0.3s ease-out;
+}
+
+/* Tab content transitions */
+.tab-content > div {
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Agent card hover effects */
+.agent-card {
+  transition: all 0.3s ease;
+}
+
+.agent-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(255, 107, 53, 0.2);
+}
+
+/* Timeline event animation */
+.timeline-event {
+  animation: slideInRight 0.5s ease-out;
+}
+
+/* MCP Insights gauge animation */
+@keyframes gaugeProgress {
+  from {
+    stroke-dashoffset: 351.86;
+  }
+}
+
+.gauge-circle {
+  animation: gaugeProgress 2s ease-out;
+}
+
+/* One-click fix button effects */
+.fix-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.fix-button::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.fix-button:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+/* Success animation */
+@keyframes checkmark {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.success-checkmark {
+  animation: checkmark 0.6s ease-out;
+}
+
+/* Tiger branding pulse */
+.tiger-pulse {
+  animation: pulse 3s ease-in-out infinite;
+}
+
+/* NEW UI/UX ENHANCEMENT ANIMATIONS */
+
+/* Shimmer effect for skeleton loaders */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Fade in animation */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Scale up animation for modals/success */
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s ease-out;
+}
+
+/* Slide up animation for toasts */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Bounce once animation */
+@keyframes bounceOnce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-bounce-once {
+  animation: bounceOnce 0.6s ease-out;
+}
+
+/* Draw checkmark animation */
+@keyframes drawCheck {
+  0% {
+    stroke-dasharray: 0, 100;
+  }
+  100% {
+    stroke-dasharray: 100, 0;
+  }
+}
+
+.animate-draw-check {
+  stroke-dasharray: 100;
+  animation: drawCheck 0.6s ease-out forwards;
+}
+
+/* Draw path animation */
+.animate-draw-path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: drawPath 0.6s ease-out forwards;
+}
+
+@keyframes drawPath {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Draw circle animation */
+@keyframes drawCircle {
+  from {
+    stroke-dashoffset: 352;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-draw-circle {
+  animation: drawCircle 1s ease-out forwards;
+}
+
+/* Pulse slow animation */
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 2s ease-in-out infinite;
+}
+
+/* Confetti animation */
+@keyframes confetti {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.animate-confetti {
+  animation: confetti 3s ease-out forwards;
+}
+
+/* Indeterminate progress bar */
+@keyframes indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(400%);
+  }
+}
+
+.animate-indeterminate {
+  width: 25%;
+  animation: indeterminate 1.5s ease-in-out infinite;
+}
+
+/* Skeleton pulse */
+.skeleton-pulse {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Hover lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
