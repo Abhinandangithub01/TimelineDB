@@ -2,25 +2,25 @@
 
 export function NewStatsSection() {
   return (
-    <section className="py-20 px-6 bg-white">
+    <section className="py-20 px-6 bg-[#1a1d29]">
       <div className="max-w-7xl mx-auto">
         {/* Main Stat Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-16">
           <div className="text-center">
             <div className="text-5xl font-bold text-[#FF6B35] mb-2">7s</div>
-            <div className="text-gray-600 font-medium">Analysis Time</div>
+            <div className="text-gray-400 font-medium">Analysis Time</div>
           </div>
           <div className="text-center">
             <div className="text-5xl font-bold text-[#4285f4] mb-2">89%</div>
-            <div className="text-gray-600 font-medium">RAG Accuracy</div>
+            <div className="text-gray-400 font-medium">RAG Accuracy</div>
           </div>
           <div className="text-center">
             <div className="text-5xl font-bold text-[#FF6B35] mb-2">8</div>
-            <div className="text-gray-600 font-medium">Parallel Forks</div>
+            <div className="text-gray-400 font-medium">Parallel Forks</div>
           </div>
           <div className="text-center">
             <div className="text-5xl font-bold text-[#4285f4] mb-2">4</div>
-            <div className="text-gray-600 font-medium">Domain Analyses</div>
+            <div className="text-gray-400 font-medium">Domain Analyses</div>
           </div>
         </div>
 
@@ -35,8 +35,8 @@ export function NewStatsSection() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Lightning Fast</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold text-white mb-2">Lightning Fast</h3>
+              <p className="text-sm text-gray-400">
                 Complete security analysis in just 7 seconds using Tiger's zero-copy fork technology.
               </p>
             </div>
@@ -51,8 +51,8 @@ export function NewStatsSection() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Comprehensive</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold text-white mb-2">Comprehensive</h3>
+              <p className="text-sm text-gray-400">
                 Security, compliance, and performance analysis all in one intelligent platform.
               </p>
             </div>
@@ -67,8 +67,8 @@ export function NewStatsSection() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-2">Scalable</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="text-lg font-bold text-white mb-2">Scalable</h3>
+              <p className="text-sm text-gray-400">
                 Handle codebases from 10k to 10M lines with intelligent prioritization.
               </p>
             </div>

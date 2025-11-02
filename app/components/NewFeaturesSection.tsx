@@ -71,14 +71,14 @@ export function NewFeaturesSection() {
   ];
 
   return (
-    <section id="features" className="py-20 px-6 bg-white">
+    <section id="features" className="py-20 px-6 bg-[#1a1d29]">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
             Everything you need for secure development
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto">
             Comprehensive security analysis powered by Tiger Agentic Postgres
           </p>
         </div>
@@ -88,7 +88,7 @@ export function NewFeaturesSection() {
           {features.map((feature, index) => (
             <div 
               key={index}
-              className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-gray-300 hover:shadow-lg transition-all group"
+              className="bg-[#252836] border-2 border-gray-700 rounded-xl p-6 hover:border-[#FF6B35] hover:shadow-xl hover:shadow-[#FF6B35]/10 transition-all group"
             >
               {/* Icon */}
               <div className={`w-14 h-14 rounded-lg flex items-center justify-center mb-4 ${
@@ -98,12 +98,12 @@ export function NewFeaturesSection() {
               </div>
 
               {/* Title */}
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-white mb-2">
                 {feature.title}
               </h3>
 
               {/* Description */}
-              <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+              <p className="text-gray-400 mb-4 text-sm leading-relaxed">
                 {feature.description}
               </p>
 
