@@ -17,6 +17,7 @@ export default function Dashboard() {
 
   const handleStartAnalysis = async (file: File | string) => {
     try {
+      console.log('🚀 Starting analysis...', { fileType: typeof file });
       setCurrentView('analysis');
       setError(null);
       
@@ -35,11 +36,15 @@ export default function Dashboard() {
         // It's a GitHub URL
         requestBody.githubUrl = file;
         requestBody.code = `# GitHub Repository: ${file}\n# Code will be fetched and analyzed\n\n# Sample analysis for repository`;
+        console.log('📦 Using GitHub URL:', file);
       } else {
         // It's a file
         const fileContent = await file.text();
         requestBody.code = fileContent;
+        console.log('📄 File content length:', fileContent.length, 'characters');
       }
+      
+      console.log('📤 Sending request to /api/analysis/start');
       
       // Start analysis via API
       const response = await fetch('/api/analysis/start', {
@@ -47,6 +52,8 @@ export default function Dashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(requestBody)
       });
+      
+      console.log('📥 Response status:', response.status, response.statusText);
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
@@ -54,6 +61,7 @@ export default function Dashboard() {
       }
 
       const { sessionId: newSessionId } = await response.json();
+      console.log('✅ Analysis started! Session ID:', newSessionId);
       setSessionId(newSessionId);
 
       // Wait for analysis to complete (simplified approach)
@@ -61,8 +69,11 @@ export default function Dashboard() {
       let attempts = 0;
       const maxAttempts = 90; // 3 minutes max
       
+      console.log('🔄 Starting status polling...');
+      
       const checkCompletion = setInterval(async () => {
         attempts++;
+        console.log(`📊 Status check attempt ${attempts}/${maxAttempts}`);
         
         try {
           // Try direct fetch without using the problematic dynamic route
@@ -74,12 +85,15 @@ export default function Dashboard() {
           
           if (statusResponse.ok) {
             const statusData = await statusResponse.json();
+            console.log('📊 Status data:', statusData);
             
             if (statusData.status === 'completed' && statusData.results) {
+              console.log('✅ Analysis completed successfully!');
               clearInterval(checkCompletion);
               setAnalysisData(statusData.results);
               setCurrentView('results');
             } else if (statusData.status === 'error') {
+              console.error('❌ Analysis failed!');
               clearInterval(checkCompletion);
               const errorMessage = statusData.error || statusData.message || 'Analysis failed';
               console.error('Analysis error from server:', statusData);
@@ -87,11 +101,13 @@ export default function Dashboard() {
               setCurrentView('upload');
             } else if (statusData.status === 'not_found') {
               // Session not found, keep polling but log it
-              console.warn('Session not found yet, continuing to poll...');
+              console.warn('⚠️ Session not found yet, continuing to poll...');
+            } else {
+              console.log(`⏳ Status: ${statusData.status}, Progress: ${statusData.progress}%`);
             }
           }
         } catch (err) {
-          console.error('Status check error:', err);
+          console.error('❌ Status check error:', err);
         }
         
         // Timeout after max attempts
