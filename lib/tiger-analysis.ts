@@ -772,8 +772,7 @@ async function performAIOnlyAnalysis(
         reason: 'Using AI APIs directly (no database)',
         phase: 'ai-only'
       },
-      certifications: await recommendCertificationsWithGroq(securityResults.findings),
-      analysisTime: totalTime
+      certifications: await recommendCertificationsWithGroq(securityResults.findings)
     };
   } catch (error) {
     console.error('❌ AI-only analysis error:', error);
