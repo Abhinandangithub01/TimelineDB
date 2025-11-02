@@ -21,13 +21,22 @@ export async function POST(request: NextRequest) {
         }, { status: 200 }); // Return 200 even if not found to avoid 404 errors
       }
       
-      return NextResponse.json({
+      // Include error message if status is error
+      const response: any = {
         sessionId: session.sessionId,
         status: session.status,
         progress: Math.round(session.progress),
         currentStage: session.currentStage,
         results: session.status === 'completed' ? session.results : null
-      });
+      };
+      
+      // Add error field if session has error status
+      if (session.status === 'error') {
+        response.error = 'Analysis failed - check server logs for details';
+        response.message = 'Please check environment variables are configured correctly';
+      }
+      
+      return NextResponse.json(response);
     }
     
     // Validate with Zod schema

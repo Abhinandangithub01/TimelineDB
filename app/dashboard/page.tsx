@@ -81,7 +81,9 @@ export default function Dashboard() {
               setCurrentView('results');
             } else if (statusData.status === 'error') {
               clearInterval(checkCompletion);
-              setError('Analysis failed');
+              const errorMessage = statusData.error || statusData.message || 'Analysis failed';
+              console.error('Analysis error from server:', statusData);
+              setError(`Analysis failed: ${errorMessage}`);
               setCurrentView('upload');
             } else if (statusData.status === 'not_found') {
               // Session not found, keep polling but log it
