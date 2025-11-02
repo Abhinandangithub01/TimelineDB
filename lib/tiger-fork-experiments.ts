@@ -158,7 +158,7 @@ async function analyzeWithStrictRules(code: string, forkName: string): Promise<a
     { type: 'Eval Usage', pattern: /eval\(|Function\(|setTimeout.*\(/i },
   ];
   
-  const findings = [];
+  const findings: any[] = [];
   const lines = code.split('\n');
   
   lines.forEach((line, index) => {
@@ -191,7 +191,7 @@ async function analyzeWithPermissiveRules(code: string, forkName: string): Promi
     { type: 'Command Injection', pattern: /os\.system\(.*\+|subprocess.*shell=True/i },
   ];
   
-  const findings = [];
+  const findings: any[] = [];
   const lines = code.split('\n');
   
   lines.forEach((line, index) => {
@@ -217,7 +217,7 @@ async function analyzeWithPermissiveRules(code: string, forkName: string): Promi
  */
 async function analyzeWithCustomRules(code: string, rules: any, forkName: string): Promise<any[]> {
   // Custom pattern matching based on provided rules
-  const findings = [];
+  const findings: any[] = [];
   const lines = code.split('\n');
   
   // Use custom patterns if provided, otherwise use balanced set
@@ -303,7 +303,7 @@ export async function validateNewPatterns(
   
   try {
     const mainPool = getMainPool();
-    const forkSession = await createTigerForks(mainPool, 2);
+    const forkSession = await createTigerForks(mainPool);
     
     // Fork 1: Existing patterns
     // Fork 2: New patterns
@@ -409,7 +409,7 @@ export async function runSafeExperiment<T>(
   
   try {
     const mainPool = getMainPool();
-    const forkSession = await createTigerForks(mainPool, 1);
+    const forkSession = await createTigerForks(mainPool);
     const forkName = forkSession.forkNames[0];
     
     console.log(`  Using fork ${forkName} for experiment`);
