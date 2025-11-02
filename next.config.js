@@ -2,7 +2,6 @@
 const nextConfig = {
   // Production optimizations
   reactStrictMode: true,
-  swcMinify: true,
   
   // Performance optimizations
   compiler: {
@@ -23,7 +22,6 @@ const nextConfig = {
   
   // Experimental features for better performance
   experimental: {
-    optimizeCss: true,
     optimizePackageImports: ['lucide-react'],
   },
 };
