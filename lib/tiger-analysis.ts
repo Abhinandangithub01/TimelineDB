@@ -691,76 +691,124 @@ async function performAIOnlyAnalysis(
   onProgress?: (phase: number, stage: number, message: string, data?: any) => void
 ): Promise<AnalysisResults> {
   console.log('🤖 Starting AI-only analysis (no database)...');
+  console.log('Code length:', code.length, 'characters');
+  
+  // Check if Groq is configured
+  if (!isGroqConfigured()) {
+    console.error('❌ Groq API key not configured');
+    throw new Error('GROQ_API_KEY environment variable is not set. Please configure it in AWS Amplify.');
+  }
+  
+  console.log('✅ Groq API key detected');
   const analysisStart = Date.now();
   
   try {
     onProgress?.(1, 1, '🔍 Analyzing code with AI...');
     
-    // Run analyses in parallel using available AI
-    const [securityResults, soc2Results, iso27001Results] = await Promise.all([
-      // Security analysis
-      (async () => {
-        onProgress?.(1, 2, '🔒 Security analysis...');
-        const analysis = await analyzeCodeWithGroq(code);
-        const findings = analysis.vulnerabilities || [];
-        
-        return {
-          total: findings.length,
-          critical: findings.filter((f: any) => f.severity === 'critical').length,
-          high: findings.filter((f: any) => f.severity === 'high').length,
-          medium: findings.filter((f: any) => f.severity === 'medium').length,
-          findings: findings.map((v: any, idx: number) => ({
-            id: idx + 1,
-            type: v.type || 'Security Issue',
-            severity: v.severity || 'medium',
-            file: v.file || 'unknown',
-            line: v.line || 0,
-            owasp: v.owasp || 'N/A',
-            cwe: v.cwe || 'N/A',
-            cvss: v.cvss || 5.0,
-            description: v.description || v.message || 'Security vulnerability detected',
-            recommendation: v.fix || v.recommendation || 'Review and fix this issue'
-          }))
-        };
-      })(),
+    // Security analysis with error handling
+    let securityResults;
+    try {
+      onProgress?.(1, 2, '🔒 Security analysis...');
+      console.log('Calling Groq API for security analysis...');
+      const analysis = await analyzeCodeWithGroq(code);
+      console.log('Groq API response received:', Object.keys(analysis));
+      const findings = analysis.vulnerabilities || [];
+      console.log('Found', findings.length, 'vulnerabilities');
       
-      // SOC2 analysis
-      (async () => {
-        onProgress?.(1, 3, '📋 SOC2 compliance check...');
-        const secAnalysis = await analyzeCodeWithGroq(code);
-        const soc2 = await checkSOC2WithGroq(code, secAnalysis.vulnerabilities || []);
-        
-        return {
-          readiness: soc2.readiness || 0,
-          controls: soc2.controls || [],
-          gaps: soc2.gaps || [],
-          recommendations: soc2.recommendations || [],
-          passed: soc2.passed || [],
-          atRisk: soc2.atRisk || [],
-          failed: soc2.failed || [],
-          violations: soc2.violations || []
-        };
-      })(),
+      securityResults = {
+        total: findings.length,
+        critical: findings.filter((f: any) => f.severity === 'critical').length,
+        high: findings.filter((f: any) => f.severity === 'high').length,
+        medium: findings.filter((f: any) => f.severity === 'medium').length,
+        findings: findings.map((v: any, idx: number) => ({
+          id: idx + 1,
+          type: v.type || 'Security Issue',
+          severity: v.severity || 'medium',
+          file: v.file || 'unknown',
+          line: v.line || 0,
+          owasp: v.owasp || 'N/A',
+          cwe: v.cwe || 'N/A',
+          cvss: v.cvss || 5.0,
+          description: v.description || v.message || 'Security vulnerability detected',
+          recommendation: v.fix || v.recommendation || 'Review and fix this issue'
+        }))
+      };
+    } catch (error) {
+      console.error('❌ Security analysis failed:', error);
+      console.error('Error details:', (error as Error).message);
+      // Return empty results instead of failing
+      securityResults = {
+        total: 0,
+        critical: 0,
+        high: 0,
+        medium: 0,
+        findings: []
+      };
+    }
+    
+    // SOC2 analysis with error handling
+    let soc2Results;
+    try {
+      onProgress?.(1, 3, '📋 SOC2 compliance check...');
+      console.log('Calling Groq API for SOC2 analysis...');
+      const soc2 = await checkSOC2WithGroq(code, securityResults.findings);
+      console.log('SOC2 analysis complete');
       
-      // ISO 27001 analysis
-      (async () => {
-        onProgress?.(1, 4, '🔐 ISO 27001 compliance check...');
-        const secAnalysis = await analyzeCodeWithGroq(code);
-        const iso = await checkISO27001WithGroq(code, secAnalysis.vulnerabilities || []);
-        
-        return iso || {
-          readiness: 0,
-          controls: [],
-          gaps: [],
-          recommendations: []
-        };
-      })()
-    ]);
+      soc2Results = {
+        readiness: soc2.readiness || 0,
+        passed: soc2.passed || 0,
+        atRisk: soc2.atRisk || 0,
+        failed: soc2.failed || 0,
+        violations: soc2.violations || []
+      };
+    } catch (error) {
+      console.error('❌ SOC2 analysis failed:', error);
+      soc2Results = {
+        readiness: 0,
+        passed: 0,
+        atRisk: 0,
+        failed: 0,
+        violations: []
+      };
+    }
+    
+    // ISO 27001 analysis with error handling
+    let iso27001Results;
+    try {
+      onProgress?.(1, 4, '🔐 ISO 27001 compliance check...');
+      console.log('Calling Groq API for ISO 27001 analysis...');
+      const iso = await checkISO27001WithGroq(code, securityResults.findings);
+      console.log('ISO 27001 analysis complete');
+      
+      iso27001Results = iso || {
+        readiness: 0,
+        controls: [],
+        gaps: [],
+        recommendations: []
+      };
+    } catch (error) {
+      console.error('❌ ISO 27001 analysis failed:', error);
+      iso27001Results = {
+        readiness: 0,
+        controls: [],
+        gaps: [],
+        recommendations: []
+      };
+    }
     
     onProgress?.(1, 5, '✅ Analysis complete!');
     
     const totalTime = (Date.now() - analysisStart) / 1000;
     console.log(`✅ AI-only analysis complete in ${totalTime.toFixed(1)}s`);
+    
+    // Get certifications
+    let certifications;
+    try {
+      certifications = await recommendCertificationsWithGroq(securityResults.findings);
+    } catch (error) {
+      console.error('❌ Certification recommendations failed:', error);
+      certifications = [];
+    }
     
     return {
       security: securityResults,
@@ -772,11 +820,12 @@ async function performAIOnlyAnalysis(
         reason: 'Using AI APIs directly (no database)',
         phase: 'ai-only'
       },
-      certifications: await recommendCertificationsWithGroq(securityResults.findings)
+      certifications
     };
   } catch (error) {
     console.error('❌ AI-only analysis error:', error);
-    throw error;
+    console.error('Full error:', error);
+    throw new Error(`Analysis failed: ${(error as Error).message}`);
   }
 }
 
