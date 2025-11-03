@@ -10,9 +10,22 @@ let groqClient: Groq | null = null;
 
 export function getGroqClient(): Groq {
   if (!groqClient) {
-    groqClient = new Groq({
-      apiKey: process.env.GROQ_API_KEY,
-    });
+    const apiKey = process.env.GROQ_API_KEY;
+    console.log('🔑 Groq API Key check:', apiKey ? `Present (${apiKey.substring(0, 10)}...)` : 'MISSING');
+    
+    if (!apiKey) {
+      throw new Error('GROQ_API_KEY environment variable is not set. Please configure it in AWS Amplify environment variables.');
+    }
+    
+    try {
+      groqClient = new Groq({
+        apiKey: apiKey,
+      });
+      console.log('✅ Groq client initialized successfully');
+    } catch (error) {
+      console.error('❌ Failed to initialize Groq client:', error);
+      throw new Error(`Failed to initialize Groq client: ${(error as Error).message}`);
+    }
   }
   return groqClient;
 }
@@ -21,9 +34,13 @@ export function getGroqClient(): Groq {
  * Analyze code for security vulnerabilities using Groq LLM
  */
 export async function analyzeCodeWithGroq(code: string): Promise<any> {
+  console.log('📝 analyzeCodeWithGroq called, code length:', code.length);
+  
   try {
+    console.log('🔧 Getting Groq client...');
     const client = getGroqClient();
     const model = process.env.GROQ_MODEL || 'llama-3.3-70b-versatile';
+    console.log('📡 Using model:', model);
     
     // Add line numbers to code for better analysis
     const numberedCode = code.split('\n').map((line, idx) => `${idx + 1}: ${line}`).join('\n');
@@ -65,6 +82,7 @@ Return your analysis in JSON format:
 
 CRITICAL: Every vulnerability MUST have a line number and code snippet.`;
 
+    console.log('🚀 Calling Groq API...');
     const completion = await client.chat.completions.create({
       messages: [
         {
@@ -81,15 +99,22 @@ CRITICAL: Every vulnerability MUST have a line number and code snippet.`;
       max_tokens: 2000,
       response_format: { type: 'json_object' }
     });
+    
+    console.log('✅ Groq API response received');
 
     const response = completion.choices[0]?.message?.content;
     if (!response) {
       throw new Error('No response from Groq');
     }
 
-    return JSON.parse(response);
+    const parsed = JSON.parse(response);
+    console.log('✅ Parsed response:', Object.keys(parsed));
+    return parsed;
   } catch (error) {
-    console.error('Groq analysis error, trying Perplexity fallback:', error);
+    console.error('❌ Groq analysis error:', error);
+    console.error('Error type:', (error as any).constructor.name);
+    console.error('Error message:', (error as Error).message);
+    console.error('Error stack:', (error as Error).stack);
     
     // Fallback to Perplexity
     if (isPerplexityConfigured()) {
@@ -97,7 +122,8 @@ CRITICAL: Every vulnerability MUST have a line number and code snippet.`;
       return await analyzeCodeWithPerplexity(code);
     }
     
-    throw error;
+    console.error('❌ No fallback available, throwing error');
+    throw new Error(`Groq API failed: ${(error as Error).message}`);
   }
 }
 
