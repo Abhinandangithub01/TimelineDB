@@ -8,25 +8,13 @@ interface UploadViewProps {
 
 export function UploadView({ onStartAnalysis }: UploadViewProps) {
   const [githubUrl, setGithubUrl] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [pastedCode, setPastedCode] = useState('');
-  const [activeTab, setActiveTab] = useState<'file' | 'paste' | 'github'>('file');
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-      setActiveTab('file');
-    }
-  };
+  const [activeTab, setActiveTab] = useState<'paste' | 'github'>('paste');
 
   const handleSubmit = () => {
-    if (activeTab === 'file' && selectedFile) {
-      onStartAnalysis(selectedFile);
-    } else if (activeTab === 'paste' && pastedCode.trim()) {
-      // Create a File object from pasted code
-      const blob = new Blob([pastedCode], { type: 'text/plain' });
-      const file = new File([blob], 'pasted-code.txt', { type: 'text/plain' });
-      onStartAnalysis(file);
+    if (activeTab === 'paste' && pastedCode.trim()) {
+      // Pass code directly as string
+      onStartAnalysis(pastedCode);
     } else if (activeTab === 'github' && githubUrl.trim()) {
       onStartAnalysis(githubUrl);
     }
@@ -49,16 +37,6 @@ export function UploadView({ onStartAnalysis }: UploadViewProps) {
         {/* Tabs */}
         <div className="flex gap-1 mb-4 border-b border-gray-200">
           <button
-            onClick={() => setActiveTab('file')}
-            className={`px-4 py-2 text-sm font-medium transition ${
-              activeTab === 'file'
-                ? 'text-tiger-orange border-b-2 border-tiger-orange'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            Upload File
-          </button>
-          <button
             onClick={() => setActiveTab('paste')}
             className={`px-4 py-2 text-sm font-medium transition ${
               activeTab === 'paste'
@@ -79,42 +57,6 @@ export function UploadView({ onStartAnalysis }: UploadViewProps) {
             GitHub URL
           </button>
         </div>
-
-        {/* File Upload Tab */}
-        {activeTab === 'file' && (
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4 hover:border-tiger-orange transition">
-          <div className="flex justify-center mb-3">
-            <svg className="w-16 h-16 text-tiger-orange" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-              {/* Folder with fort elements */}
-              <path d="M10 30 L40 30 L45 20 L90 20 L90 80 L10 80 Z" fill="currentColor" opacity="0.3" />
-              <path d="M10 30 L90 30 L90 80 L10 80 Z" fill="currentColor" opacity="0.6" />
-              {/* Fort battlements on folder */}
-              <rect x="20" y="25" width="6" height="5" fill="currentColor" />
-              <rect x="35" y="25" width="6" height="5" fill="currentColor" />
-              <rect x="50" y="25" width="6" height="5" fill="currentColor" />
-              <rect x="65" y="25" width="6" height="5" fill="currentColor" />
-              <rect x="80" y="25" width="6" height="5" fill="currentColor" />
-            </svg>
-          </div>
-          <p className="text-sm font-semibold text-gray-900 mb-2">Drop your code here</p>
-          <p className="text-sm text-gray-600 mb-3">or</p>
-          <label className="bg-tiger-orange hover:bg-tiger-dark text-white font-semibold py-2 px-6 rounded-lg cursor-pointer inline-block transition text-sm">
-            Browse Files
-            <input
-              type="file"
-              className="hidden"
-              accept=".zip,.tar.gz"
-              onChange={handleFileChange}
-            />
-          </label>
-          {selectedFile && (
-            <p className="mt-3 text-sm text-tiger-orange font-semibold">✓ {selectedFile.name} selected</p>
-          )}
-          <p className="text-xs text-gray-500 mt-3">
-            Supported: .zip, .tar.gz | Max size: 500 MB
-          </p>
-        </div>
-        )}
 
         {/* Paste Code Tab */}
         {activeTab === 'paste' && (
@@ -180,7 +122,6 @@ export function UploadView({ onStartAnalysis }: UploadViewProps) {
         <button
           onClick={handleSubmit}
           disabled={
-            (activeTab === 'file' && !selectedFile) ||
             (activeTab === 'paste' && !pastedCode.trim()) ||
             (activeTab === 'github' && !githubUrl.trim())
           }

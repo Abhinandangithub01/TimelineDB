@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAnalysisSession, startAnalysis, getAnalysisSession } from '@/lib/analysis-service';
 import { AnalysisRequestSchema, sanitizeInput } from '@/lib/validation';
+import { fetchGitHubRepository, isGitHubUrl } from '@/lib/github-fetcher';
 import { z } from 'zod';
 
 export async function POST(request: NextRequest) {
@@ -85,10 +86,34 @@ export async function POST(request: NextRequest) {
     log('✅ Validation passed');
     const { code, githubUrl, options } = validationResult.data;
 
-    // Sanitize input
-    const codeContent = code 
-      ? sanitizeInput(code) 
-      : `Sample code from ${githubUrl}`;
+    // Handle GitHub URL or direct code
+    let codeContent: string;
+    
+    if (githubUrl && isGitHubUrl(githubUrl)) {
+      log('📦 GitHub URL detected, fetching repository...');
+      try {
+        codeContent = await fetchGitHubRepository(githubUrl);
+        log('✅ GitHub repository fetched successfully');
+      } catch (error) {
+        log('❌ GitHub fetch failed:', (error as Error).message);
+        return NextResponse.json(
+          { 
+            error: 'GitHub fetch failed', 
+            details: (error as Error).message 
+          },
+          { status: 400 }
+        );
+      }
+    } else if (code) {
+      codeContent = sanitizeInput(code);
+      log('📝 Using provided code');
+    } else {
+      log('❌ No code or GitHub URL provided');
+      return NextResponse.json(
+        { error: 'Either code or githubUrl must be provided' },
+        { status: 400 }
+      );
+    }
     
     log('📝 Code content length:', codeContent.length);
 

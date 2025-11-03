@@ -31,14 +31,19 @@ export default function Dashboard() {
         }
       };
 
-      // Handle file or URL
+      // Handle GitHub URL or direct code string
       if (typeof file === 'string') {
-        // It's a GitHub URL
-        requestBody.githubUrl = file;
-        requestBody.code = `# GitHub Repository: ${file}\n# Code will be fetched and analyzed\n\n# Sample analysis for repository`;
-        console.log('📦 Using GitHub URL:', file);
+        // Check if it's a GitHub URL
+        if (file.includes('github.com')) {
+          requestBody.githubUrl = file;
+          console.log('📦 Using GitHub URL:', file);
+        } else {
+          // It's pasted code
+          requestBody.code = file;
+          console.log('📄 Code content length:', file.length, 'characters');
+        }
       } else {
-        // It's a file
+        // It's a file (shouldn't happen anymore, but keep for safety)
         const fileContent = await file.text();
         requestBody.code = fileContent;
         console.log('📄 File content length:', fileContent.length, 'characters');
