@@ -21,7 +21,30 @@ export function CleanResultsView({ data }: CleanResultsViewProps) {
   const securityFindings = Array.isArray(data?.security?.findings) ? data.security.findings : [];
   const soc2Violations = Array.isArray(data?.soc2?.violations) ? data.soc2.violations : [];
   const iso27001Data = data?.iso27001;
-  const performanceScore = data?.mcpInsights?.performance?.overallScore || 0;
+  
+  // Calculate health score based on security findings
+  const calculateHealthScore = () => {
+    let score = 100;
+    
+    // Deduct points for security findings
+    const criticalCount = securityFindings.filter((f: any) => f.severity === 'Critical').length;
+    const highCount = securityFindings.filter((f: any) => f.severity === 'High').length;
+    const mediumCount = securityFindings.filter((f: any) => f.severity === 'Medium').length;
+    const lowCount = securityFindings.filter((f: any) => f.severity === 'Low').length;
+    
+    score -= criticalCount * 20; // -20 per critical
+    score -= highCount * 10;     // -10 per high
+    score -= mediumCount * 5;    // -5 per medium
+    score -= lowCount * 2;       // -2 per low
+    
+    // Deduct points for SOC2 violations
+    score -= soc2Violations.length * 3;
+    
+    // Ensure score doesn't go below 0
+    return Math.max(0, score);
+  };
+  
+  const performanceScore = calculateHealthScore();
 
   // Auto-fix functionality
   const applyAutoFix = (finding: any) => {
@@ -926,36 +949,36 @@ export function CleanResultsView({ data }: CleanResultsViewProps) {
 
             {/* Performance Metrics */}
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Performance Metrics</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Security Metrics</h3>
               <div className="grid grid-cols-3 gap-6">
                 {[
                   { 
-                    name: 'Query Performance', 
-                    score: data.mcpInsights?.performance?.queryPerformance || 85,
-                    metric: '< 50ms avg',
+                    name: 'Critical Vulnerabilities', 
+                    score: Math.max(0, 100 - securityFindings.filter((f: any) => f.severity === 'Critical').length * 20),
+                    metric: `${securityFindings.filter((f: any) => f.severity === 'Critical').length} found`,
                     icon: (
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                       </svg>
                     )
                   },
                   { 
-                    name: 'Index Efficiency', 
-                    score: data.mcpInsights?.performance?.indexEfficiency || 72,
-                    metric: '12/15 optimized',
+                    name: 'SOC2 Compliance', 
+                    score: Math.max(0, 100 - soc2Violations.length * 5),
+                    metric: `${soc2Violations.length} violations`,
                     icon: (
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     )
                   },
                   { 
-                    name: 'Connection Pool', 
-                    score: data.mcpInsights?.performance?.connectionPool || 90,
-                    metric: '45/100 active',
+                    name: 'Code Quality', 
+                    score: Math.max(0, 100 - securityFindings.length * 3),
+                    metric: `${securityFindings.length} total issues`,
                     icon: (
                       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
                       </svg>
                     )
                   }
@@ -988,129 +1011,89 @@ export function CleanResultsView({ data }: CleanResultsViewProps) {
               </div>
             </div>
 
-            {/* Database Insights */}
+            {/* Security Insights */}
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Database Insights</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Security Insights</h3>
               <div className="grid grid-cols-2 gap-6">
-                {/* Schema Analysis */}
+                {/* Vulnerability Breakdown */}
                 <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Schema Analysis</h4>
+                  <h4 className="font-bold text-gray-900 mb-4">Vulnerability Breakdown</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Tables</span>
-                      <span className="font-semibold text-gray-900">{data.mcpInsights?.schema?.totalTables || 24}</span>
+                      <span className="text-sm text-gray-600">Critical</span>
+                      <span className="font-semibold text-red-600">{securityFindings.filter((f: any) => f.severity === 'Critical').length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Total Indexes</span>
-                      <span className="font-semibold text-gray-900">{data.mcpInsights?.schema?.totalIndexes || 45}</span>
+                      <span className="text-sm text-gray-600">High</span>
+                      <span className="font-semibold text-orange-600">{securityFindings.filter((f: any) => f.severity === 'High').length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Foreign Keys</span>
-                      <span className="font-semibold text-gray-900">{data.mcpInsights?.schema?.foreignKeys || 18}</span>
+                      <span className="text-sm text-gray-600">Medium</span>
+                      <span className="font-semibold text-yellow-600">{securityFindings.filter((f: any) => f.severity === 'Medium').length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Database Size</span>
-                      <span className="font-semibold text-gray-900">{data.mcpInsights?.schema?.size || '2.4 GB'}</span>
+                      <span className="text-sm text-gray-600">Low</span>
+                      <span className="font-semibold text-blue-600">{securityFindings.filter((f: any) => f.severity === 'Low').length}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Query Statistics */}
+                {/* Compliance Status */}
                 <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Query Statistics</h4>
+                  <h4 className="font-bold text-gray-900 mb-4">Compliance Status</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Avg Query Time</span>
-                      <span className="font-semibold text-green-600">{data.mcpInsights?.queries?.avgTime || '45ms'}</span>
+                      <span className="text-sm text-gray-600">SOC2 Violations</span>
+                      <span className="font-semibold text-orange-600">{soc2Violations.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Slow Queries</span>
-                      <span className="font-semibold text-yellow-600">{data.mcpInsights?.queries?.slowQueries || 12}</span>
+                      <span className="text-sm text-gray-600">ISO 27001 Score</span>
+                      <span className="font-semibold text-green-600">{iso27001Data?.complianceScore || 'N/A'}%</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Cache Hit Ratio</span>
-                      <span className="font-semibold text-green-600">{data.mcpInsights?.queries?.cacheHitRatio || '94%'}</span>
+                      <span className="text-sm text-gray-600">Total Issues</span>
+                      <span className="font-semibold text-gray-900">{securityFindings.length}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Queries/Second</span>
-                      <span className="font-semibold text-gray-900">{data.mcpInsights?.queries?.qps || 1250}</span>
+                      <span className="text-sm text-gray-600">Certifications</span>
+                      <span className="font-semibold text-gray-900">{data.certifications?.length || 0}</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Optimization Recommendations */}
+            {/* Top Priority Fixes */}
             <div>
-              <h3 className="text-xl font-bold text-gray-900 mb-6">Optimization Recommendations</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Top Priority Fixes</h3>
               <div className="space-y-4">
-                {[
-                  {
-                    priority: 'high',
-                    title: 'Add Index on users.email',
-                    description: 'Queries on user email are performing full table scans. Adding an index will improve performance by 10x.',
-                    impact: 'High',
-                    effort: 'Low',
-                    table: 'users',
-                    query: 'CREATE INDEX idx_users_email ON users(email);'
-                  },
-                  {
-                    priority: 'medium',
-                    title: 'Optimize JOIN on orders table',
-                    description: 'The orders table JOIN with customers is inefficient. Consider adding a composite index.',
-                    impact: 'Medium',
-                    effort: 'Medium',
-                    table: 'orders',
-                    query: 'CREATE INDEX idx_orders_customer_date ON orders(customer_id, order_date);'
-                  },
-                  {
-                    priority: 'low',
-                    title: 'Archive old audit logs',
-                    description: 'Audit logs table has grown to 500MB. Archive logs older than 1 year to improve query performance.',
-                    impact: 'Low',
-                    effort: 'High',
-                    table: 'audit_logs',
-                    query: 'DELETE FROM audit_logs WHERE created_at < NOW() - INTERVAL \'1 year\';'
-                  }
-                ].map((rec, index) => (
+                {securityFindings.slice(0, 3).map((finding: any, index: number) => (
                   <div key={index} className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-[#FF6B35] transition-colors">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <h4 className="font-bold text-gray-900">{rec.title}</h4>
-                          <span className={`px-3 py-1 rounded-lg text-xs font-bold ${
-                            rec.priority === 'high' ? 'bg-red-100 text-red-800' :
-                            rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-blue-100 text-blue-800'
-                          }`}>
-                            {rec.priority.toUpperCase()} PRIORITY
-                          </span>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                          finding.severity === 'Critical' ? 'bg-red-100 text-red-700' :
+                          finding.severity === 'High' ? 'bg-orange-100 text-orange-700' :
+                          finding.severity === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}>
+                          {finding.severity}
                         </div>
-                        <p className="text-gray-600 mb-4">{rec.description}</p>
-                        <div className="flex items-center gap-6 text-sm">
-                          <div>
-                            <span className="text-gray-500">Impact:</span>
-                            <span className="font-semibold text-gray-900 ml-2">{rec.impact}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Effort:</span>
-                            <span className="font-semibold text-gray-900 ml-2">{rec.effort}</span>
-                          </div>
-                          <div>
-                            <span className="text-gray-500">Table:</span>
-                            <span className="font-mono text-sm text-[#FF6B35] ml-2">{rec.table}</span>
-                          </div>
-                        </div>
+                        <h4 className="font-bold text-gray-900">{finding.type}</h4>
+                      </div>
+                      <div className="flex gap-2">
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                          {finding.owasp || 'Security'}
+                        </span>
+                        <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                          {finding.cwe || 'CWE'}
+                        </span>
                       </div>
                     </div>
-                    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                      <div className="text-xs font-semibold text-gray-500 mb-2">SUGGESTED QUERY</div>
-                      <pre className="text-sm font-mono text-gray-800 overflow-x-auto">{rec.query}</pre>
-                    </div>
-                    <div className="mt-4">
-                      <button className="bg-[#FF6B35] hover:bg-[#ff5722] text-white px-6 py-2 rounded-lg font-semibold transition-colors">
-                        Apply Optimization
-                      </button>
+                    <p className="text-sm text-gray-600 mb-3">{finding.description}</p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span>📄 {finding.file || 'Multiple files'}</span>
+                      {finding.line && <span>Line {finding.line}</span>}
                     </div>
                   </div>
                 ))}
