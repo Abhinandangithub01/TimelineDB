@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { TimelineDBLogo } from '@/app/components/icons/TimelineDBLogo';
-import Link from 'next/link';
+import { LeftNavigation } from '@/app/components/LeftNavigation';
 
 interface Timeline {
   id: string;
@@ -56,22 +55,12 @@ export default function TimelineDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {/* Header */}
-      <nav className="bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <TimelineDBLogo className="w-8 h-8" />
-            <span className="text-xl font-bold text-gray-900">TimelineDB</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Dashboard</span>
-          </div>
-        </div>
-      </nav>
-
+    <div className="flex min-h-screen bg-gray-50">
+      <LeftNavigation />
+      
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="flex-1 ml-64">
+        <div className="px-8 py-12">
         {/* Welcome Banner */}
         <div className="bg-gradient-to-r from-[#6366F1] to-[#8B5CF6] rounded-2xl p-8 mb-12 text-white">
           <div className="flex items-center justify-between">
@@ -267,6 +256,7 @@ export default function TimelineDashboard() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -22,7 +22,7 @@ export default function Home() {
             <a href="#demo" className="text-gray-600 hover:text-[#6366F1] transition-colors font-medium">Demo</a>
           </div>
           
-          <Link href="/dashboard" className="bg-[#6366F1] hover:bg-[#4F46E5] text-white px-6 py-2 rounded-lg font-semibold transition-colors">
+          <Link href="/dashboard" className="bg-[#6366F1] hover:bg-[#4F46E5] text-white px-6 py-2 rounded-lg font-semibold transition-colors shadow-md hover:shadow-lg">
             Try TimelineDB
           </Link>
         </div>
