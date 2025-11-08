@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Fortify - AI-Powered Security Analysis',
-  description: 'Advanced security analysis powered by Tiger Agentic Postgres with multi-agent AI system',
+  title: 'TimelineDB - Git for Databases',
+  description: 'Time travel, instant branching, and zero-copy forks for databases. Powered by Tiger Agentic Postgres.',
   icons: {
     icon: '/favicon.svg',
   },
