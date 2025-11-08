@@ -2,11 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { testConnection, getMainPool } from '@/lib/database';
 
 export async function GET(request: NextRequest) {
-  // CRITICAL: Test logging
-  console.log('========== HEALTH CHECK CALLED ==========');
-  console.error('========== HEALTH CHECK CALLED (stderr) ==========');
-  process.stdout.write('HEALTH CHECK stdout\n');
-  process.stderr.write('HEALTH CHECK stderr\n');
+  console.log('========== TIMELINEDB HEALTH CHECK ==========');
   
   const startTime = Date.now();
   
@@ -15,11 +11,12 @@ export async function GET(request: NextRequest) {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
+    application: 'TimelineDB',
     services: {
       api: 'operational',
       database: 'unknown',
       tiger: 'unknown',
-      openai: 'unknown',
+      timelines: 'operational',
     },
     version: '1.0.0',
   };
@@ -41,15 +38,11 @@ export async function GET(request: NextRequest) {
     console.error('Database health check failed:', error);
   }
 
-  // Check AI providers
-  const aiProviders = [];
-  if (process.env.GROQ_API_KEY) aiProviders.push('groq');
-  if (process.env.PERPLEXITY_API_KEY) aiProviders.push('perplexity');
-  if (process.env.OPENAI_API_KEY) aiProviders.push('openai');
-  
-  health.services.openai = aiProviders.length > 0 
-    ? aiProviders.join('+') 
-    : 'mock';
+  // TimelineDB doesn't need AI providers, but check if configured
+  const aiConfigured = !!(process.env.GROQ_API_KEY || process.env.OPENAI_API_KEY);
+  if (aiConfigured) {
+    (health.services as any).ai = 'configured';
+  }
 
   const responseTime = Date.now() - startTime;
   
